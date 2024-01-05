@@ -25,3 +25,20 @@ Password does not meet complexity requirements:
   Processing...
   Credential updated successfully
 ```
+
+## Access VMware REST API via http
+
+```
+PS C:\Program Files (x86)\VMware\VMware Workstation> .\vmrest.exe
+VMware Workstation REST API
+Copyright (C) 2018-2020 VMware Inc.
+All Rights Reserved
+
+vmrest 1.2.0 build-17171714
+-
+Using the VMware Workstation UI while API calls are in progress is not recommended and may yield unexpected results.
+-
+Serving HTTP on 127.0.0.1:8697
+-
+Press Ctrl+C to stop.
+```
