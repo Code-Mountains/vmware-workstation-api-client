@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 )
 
 const (
@@ -56,7 +57,16 @@ type Client struct {
 func NewClient(a string, u string, p string, i bool, d bool) (*Client, error) {
 	log.Printf("[WSAPICLI] Fi: wsapiclient.go Fu: NewClient Obj:Input values %#v, %#v, %#v, %#v, %#v\n", a, u, p, i, d)
 	c := new(Client)
-	c.BaseURL, _ = url.Parse(a)
+
+	// c.BaseURL, _ = url.Parse(a)
+
+	var err error
+	c.BaseURL, err = url.Parse(a)
+	if err != nil {
+		log.Printf("[WSAPICLI][ERROR] Fi: wsapiclient.go Fu: NewClient Obj:URL parsing error %#v\n", err)
+		return nil, err
+	}
+
 	// log.Printf("[WSAPICLI] Fi: wsapiclient.go Fu: NewClient Obj:URL %#v\n", c.BaseURL)
 	c.User = u
 	c.Password = p
@@ -95,8 +105,14 @@ func NewClient(a string, u string, p string, i bool, d bool) (*Client, error) {
 // error: when the client generate some error is storage in this var.
 func New() (*Client, error) {
 	c, err := NewClient(defaultBaseURL, defaultUser, defaultPassword, defaultInsecure, defaultDebug)
+
+	if err != nil {
+		log.Printf("[WSAPICLI][ERROR] Error creating client: %v", err)
+		return nil, err
+	}
+
 	log.Printf("[WSAPICLI] Fi: wsapiclient.go Fu: New Obj:api Client %#v\n", c)
-	return c, err
+	return c, nil
 }
 
 // SwitchDebug method of object *Client to change the debug parameter
@@ -151,6 +167,12 @@ func (c *Client) ConfigCli(a string, u string, p string, i bool, d bool) {
 // p: URL path of the API REST of the sever, m: Type of method GET, PUT, POST, DELETE
 // pl: bytes.Buffer for read the Body of the request, Return: cl:
 func (c *Client) httpRequest(p string, m string, pl bytes.Buffer) (io.ReadCloser, error) {
+
+	if c == nil || c.Client == nil {
+		log.Printf("[WSAPICLI][ERROR] Client is nil")
+		return nil, errors.New("client is nil")
+	}
+
 	req, err := http.NewRequest(m, c.requestPath(p), &pl)
 	if err != nil {
 		log.Printf("[WSAPICLI][ERROR] Fi: wsapiclient.go Fu: httpRequest Obj:request error %#v\n", err)
@@ -198,12 +220,20 @@ func (c *Client) httpRequest(p string, m string, pl bytes.Buffer) (io.ReadCloser
 }
 
 // requestPath method show the URL to the request of httpClient.
-//Input:
+// Input:
 // p: string just the path of the URL.
-//Return:
+// Return:
 // string with the complete URL to access
 func (c *Client) requestPath(p string) string {
+
+	if c == nil || c.BaseURL == nil {
+		log.Printf("[WSAPICLI][ERROR] Client or BaseURL is nil")
+		return ""
+	}
+
 	r := fmt.Sprintf("%s/%s", c.BaseURL, p)
 	log.Printf("[WSAPICLI] Fi: wsapiclient.go Fu: requestPath Obj:%#v\n", r)
-	return r
+	// return r
+
+	return c.BaseURL.ResolveReference(&url.URL{Path: path.Join(c.BaseURL.Path, p)}).String()
 }

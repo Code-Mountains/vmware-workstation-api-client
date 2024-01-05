@@ -61,6 +61,11 @@ func main() {
 			}
 		}
 	}
+
+	if varschema == "" || vardomain == "" || varport == "" || varfolder == "" {
+		log.Fatalf("One or more URL components are missing. Please check your config.ini.")
+	}
+
 	varurl = varschema + "://" + vardomain + ":" + varport + "/" + varfolder
 	fmt.Printf("varuser: %s, varpass: %s, varschema: %s, vardomain: %s, varport: %s, varfolder: %s, varparentid: %s, varinsecure: %v, vardebug: %v\n", varuser, varpass, varschema, vardomain, varport, varfolder, varparentid, varinsecure, vardebug)
 	fmt.Printf("VarURL: %s\n", varurl)

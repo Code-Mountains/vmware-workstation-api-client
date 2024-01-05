@@ -40,7 +40,7 @@ Function build { ## Build the binary of the module
         New-Item ${DIRELEASES} -itemtype directory | Out-Null
     }
     & go get
-    & go build -o ${DIRELEASES}/${global:BINARY}
+    & go build -buildvcs=false -o ${DIRELEASES}/${global:BINARY}
     Write-Host "we made the binary"
 }
 
